@@ -49,15 +49,17 @@
 
 \title{L-GRU: Building a Hybrid Model to Improve Stock Price Prediction}
 
-\author{Tran Dinh Dang$^1$, Sittixay Chounlamany$^1$, Nguyen Quoc Dung$^1$, Nguyen Viet Hung$^{2,*}$}
+\author{Tran Dinh Dang$^1$, Sittixay Chounlamany$^1$, Nguyen Quoc Dung$^1$, Le Mai Nam$^2$, \\Le Thi Huyen Trang$^2$, Nguyen Viet Hung$^{3,*}$}
 
 \affil{ 
 $^1$ Faculty of Information Technology, Ha Tinh University, Hatinh, Vietnam            
 \authorcr \authorcr
-$^2$ International Training and Cooperation Institute, East Asia University of Technology, Bacninh, Vietnam            
+$^2$ Faculty of Information Technology, East Asia University of Technology, Bacninh, Vietnam            
+\authorcr \authorcr
+$^3$ International Training and Cooperation Institute, East Asia University of Technology, Bacninh, Vietnam            
 \authorcr  \authorcr
-$^*$Corresponding email: hungnv@eaut.edu.vn
-\authorcr  \authorcr
+\{11231502003, 11231502023\}@hu.edu.vn, dung.nguyenquoc@htu.edu.vn, \\\{namlm, tranglth, hungnv\}@eaut.edu.vn
+\authorcr \authorcr
 }
 
 
@@ -97,7 +99,7 @@ The stock market is widely recognized as a cornerstone of the global economy, no
 
 In practice, however, financial markets deviate significantly from this idealized efficiency. Stock prices are influenced by a wide range of nonlinear and interdependent factors, including investor psychology, market sentiment, macroeconomic conditions, and geopolitical shocks \cite{akinrinola2024predicting, satishbhai2025stock}. These dynamics create strong non-stationarity, high volatility, and complex temporal dependencies that traditional econometric models are unable to capture effectively. As a result, more advanced computational techniques are required to address the inherent unpredictability of financial time series.
 
-In recent years, deep learning—particularly Recurrent Neural Networks (RNNs)—has demonstrated strong potential for modeling sequential data such as stock prices. Among these, Long Short-Term Memory (LSTM) networks and Gated Recurrent Units (GRU) have emerged as leading architectures. LSTM excels at modeling long-term dependencies through its explicit memory cell, while GRU offers faster training and fewer parameters, making it computationally efficient. However, each architecture faces trade-offs: LSTM is often computationally heavy, whereas GRU, though lightweight, may lose fidelity in capturing long-range patterns. Hybrid approaches that attempt to combine LSTM and GRU have therefore emerged as promising solutions \cite{alomar2024rnns, bhavani2022comparative, karim2022stock, chavhan2024deep}.
+In recent years, deep learning—particularly Recurrent Neural Networks (RNNs)—has demonstrated strong potential for modeling sequential data such as stock prices. Among these, Long Short-Term Memory (LSTM) networks and Gated Recurrent Units (GRU) have emerged as leading architectures. LSTM excels at modeling long-term dependencies through its explicit memory cell, while GRU offers faster training and fewer parameters, making it computationally efficient. However, each architecture faces trade-offs: LSTM is often computationally heavy, whereas GRU, though lightweight, may lose fidelity in capturing long-range patterns. Hybrid approaches that attempt to combine LSTM and GRU have therefore emerged as promising solutions \cite{alomar2024rnns, bhavani2022comparative, karim2022stock, chavhan2024deep}. In addition, recent studies have also explored the application of deep learning to sequential prediction tasks in domains such as 360-degree video streaming, where LSTM and GRU have been used successfully for accurate viewport estimation \cite{hung2025building, nguyen2022accurate, hung2025heverl}. While these works primarily address challenges in immersive media, they highlight the effectiveness of recurrent architectures in modeling complex, nonstationary sequences—an ability that is equally critical for financial time series forecasting. Motivated by these insights, this study introduces L-GRU, a redesigned recurrent cell specifically designed to improve stock price prediction.
 
 Despite these efforts, most existing hybrids rely on architectural stacking or ensembling rather than rethinking the core recurrent cell. As such, they fail to fully reconcile the fundamental trade-off between the memory fidelity of LSTM and the efficiency of GRU. This observation motivates our central research question: Can a new recurrent unit be designed to simultaneously preserve the explicit long-term memory of LSTM while operating with the streamlined gating mechanism of GRU?
 
@@ -129,7 +131,7 @@ Stock price forecasting has long been a central theme in financial research due 
 \subsection{Traditional Statistical and Econometric Models}
 The origins of financial forecasting lie in statistical models such as the Autoregressive Integrated Moving Average (ARIMA) model \cite{box2015time}. ARIMA assumes that future values of a series can be expressed as a linear function of past values and forecast errors. While interpretable and parsimonious, ARIMA is fundamentally constrained by its linear assumption, making it ill-suited for the complex, nonlinear dynamics of financial markets \cite{makridakis2000m3}.
 
-To capture volatility clustering—a well-documented stylized fact in financial returns—the Generalized Autoregressive Conditional Heteroskedasticity (GARCH) family was introduced \cite{bollerslev1986generalized}. Extensions such as EGARCH and GJR-GARCH provide powerful tools for modeling conditional variance and remain indispensable in risk management and derivatives pricing \cite{engle1982autoregressive}. However, these models primarily forecast volatility rather than directional price movements, limiting their utility for trading strategies. Overall, statistical models lack the structural capacity to incorporate exogenous variables and to capture deep nonlinear patterns.
+On the other hand, to capture volatility clustering a well-documented stylized fact in financial returns, the Generalized Autoregressive Conditional Heteroskedasticity (GARCH) family was introduced \cite{bollerslev1986generalized, rachev2011financial}. Extensions such as EGARCH and GJR-GARCH provide powerful tools for modeling conditional variance and remain indispensable in risk management and derivatives pricing \cite{engle1982autoregressive}. However, these models primarily forecast volatility rather than directional price movements, limiting their utility for trading strategies. Overall, statistical models lack the structural capacity to incorporate exogenous variables and to capture deep nonlinear patterns.
 
 \subsection{Classical Machine Learning Methods}
 The late 20th century witnessed a paradigm shift with the rise of machine learning. Support Vector Machines (SVMs), particularly in regression form (SVR), leveraged kernel methods to model nonlinear relationships in financial data \cite{cortes1995support}. While SVMs often outperform linear models in predicting stock movement \cite{huang2005forecasting}, they are computationally expensive for large-scale datasets and highly sensitive to kernel selection and hyperparameters.
@@ -144,7 +146,7 @@ Recurrent Neural Networks (RNNs) introduced memory through recurrent connections
 
 Long Short-Term Memory (LSTM) networks overcame this limitation by introducing a dedicated cell state regulated by input, forget, and output gates \cite{hochreiter1997long}. This design allowed selective retention of long-term dependencies and established LSTM as a dominant baseline in stock forecasting \cite{fischer2018deep, moghar2020stock}.
 
-Gated Recurrent Units (GRUs) streamlined the LSTM by merging the input and forget gates into a single update gate and combining the cell and hidden states \cite{cho2014learning}. This reduced parameter count improves efficiency and mitigates overfitting, especially on smaller datasets \cite{chung2014empirical}. Comparative studies \cite{xiao2024comparative, nguyen2022accurate, bhavani2022comparative} often show that LSTM and GRU perform competitively, with LSTM excelling in long-term memory preservation while GRU offers faster training.
+Gated Recurrent Units (GRUs) streamlined the LSTM by merging the input and forget gates into a single update gate and combining the cell and hidden states \cite{cho2014learning}. This reduced parameter count improves efficiency and mitigates overfitting, especially on smaller datasets \cite{chung2014empirical}. Comparative studies \cite{xiao2024comparative, bhavani2022comparative, nguyen2022accurate} often show that LSTM and GRU perform competitively, with LSTM excelling in long-term memory preservation while GRU offers faster training.
 
 Building on these foundations, hybrid and novel architectures have emerged. For example, CNN-LSTM models use convolutional layers for local feature extraction before LSTM modeling \cite{hoseinzade2019cnn}, while Transformer architectures leverage self-attention to capture long-range dependencies \cite{vaswani2017attention}. Although Transformers achieve state-of-the-art performance in many sequence tasks, their quadratic computational cost and lack of inductive bias for sequentiality can be inefficient for financial data.
 
@@ -343,22 +345,22 @@ To ensure a fair and robust comparison, all experiments were conducted within a 
 \begin{enumerate}
 
 \subsubsection{Dataset Description}
+The empirical analysis is conducted on the historical stock price data of Tesla, Inc. (ticker: TSLA), a company renowned for its high volatility and significant market attention—making its stock a challenging and suitable case study for time‑series forecasting. The dataset, obtained from Yahoo Finance\footnote{https://www.kaggle.com/datasets/arashnic/time-series-forecasting-with-yahoo-stock-price}, spans the period from January 1, 2015, to January 16, 2024. This timeframe encompasses diverse market conditions, including periods of strong growth, downturns, and heightened volatility, thereby providing a solid testing ground for assessing the adaptability and generalization capabilities of the models.
 
-    The empirical analysis is conducted on the historical stock price data of Tesla, Inc. (ticker: TSLA), a company renowned for its high volatility and significant market attention—making its stock a challenging and suitable case study for time‑series forecasting. The dataset, obtained from Yahoo Finance, spans the period from January 1, 2015, to January 16, 2024. This timeframe encompasses diverse market conditions, including periods of strong growth, downturns, and heightened volatility, thereby providing a solid testing ground for assessing the adaptability and generalization capabilities of the models.
-
-    In this study, we focus on a univariate forecasting task, aiming to predict the future closing price based on its historical values. The 'Close' price is selected as the target variable. The raw time‑series data are preprocessed as follows:
-    \begin{itemize}
+In this study, we focus on a univariate forecasting task, aiming to predict the future closing price based on its historical values. The 'Close' price is selected as the target variable. The raw time‑series data are preprocessed as follows: \\
+\begin{itemize}
         \item \textbf{Normalization:}
-        To stabilize the training process and ensure that the gradients remain within a manageable range, the entire 'Close' price series is scaled to the range [0, 1] using Min‑Max normalization. The scaler is fitted exclusively on the training data to prevent data leakage from the test set. An inverse transformation is applied to the model's predictions prior to evaluation in order to interpret the results on the original price scale.
+        To stabilize the training process and ensure that the gradients remain within a manageable range, the entire 'Close' price series is scaled to the range [0, 1] using Min‑Max normalization. The scaler is fitted exclusively on the training data to prevent data leakage from the test set. An inverse transformation is applied to the model's predictions prior to evaluation in order to interpret the results on the original price scale.\\
         \item \textbf{Conversion to a supervised learning problem:}
-        The time‑series forecasting task is reformulated as a supervised learning problem using the sliding‑window method. A fixed‑length sequence of historical data, referred to as the look‑back period, is used as the input features (X) to predict a single data point for the subsequent time step (y). Following common empirical conventions in financial forecasting, a look‑back period of 60 time steps (approximately three months of trading days) is selected. This window size is considered sufficient to capture short‑ to medium‑term trends and patterns without being unduly influenced by distant, potentially irrelevant historical data.
+        The time‑series forecasting task is reformulated as a supervised learning problem using the sliding‑window method. A fixed‑length sequence of historical data, referred to as the look‑back period, is used as the input features (X) to predict a single data point for the subsequent time step (y). Following common empirical conventions in financial forecasting, a look‑back period of 60 time steps (approximately three months of trading days) is selected. This window size is considered sufficient to capture short‑ to medium‑term trends and patterns without being unduly influenced by distant, potentially irrelevant historical data.\\
         \item \textbf{Data Splitting:}
         The dataset is partitioned in chronological order to preserve the temporal structure of the data. The first 80\% of the sequential data is allocated to the training set, while the remaining 20\% constitutes the test set. This strict chronological split ensures that the model is evaluated on its ability to forecast unseen future data, simulating a real‑world application scenario. The training set is further subdivided into a 90\% training subset and a 10\% validation subset for hyperparameter tuning and the implementation of early stopping.
     \end{itemize}
 
-    \subsubsection{Baseline Models}
+\subsubsection{Baseline Models}
     
     The performance of the proposed L-GRU model is benchmarked against a comprehensive set of five powerful deep learning models for sequential data. These models were chosen to represent not only the foundational architectures from which L-GRU is derived (LSTM and GRU) and a leading architecture from a different paradigm (Transformer), but also to include other prominent hybrid architectures that have shown success in financial forecasting.
+    
     \begin{itemize}
         \item \textbf{Long Short-Term Memory (LSTM):}
         As the direct predecessor and a primary source of inspiration for L-GRU, the standard LSTM network \cite{hochreiter1997long} serves as a crucial baseline. It is renowned for its ability to capture long-range dependencies through its sophisticated gating mechanism and dedicated cell state. The LSTM model implemented for comparison features a stacked architecture with multiple layers to learn hierarchical temporal features.
@@ -386,7 +388,6 @@ To ensure a fair and robust comparison, all experiments were conducted within a 
         \item \textbf{Batch Size:}
         A batch size of 64 was used for training on the GPU-accelerated environment.
     \end{itemize}
-    
 
 
 \subsection{Estimation performance evaluation}
@@ -396,14 +397,34 @@ This subsection details the metrics used to evaluate the models' predictive accu
 
     To provide a multifaceted assessment of model performance, four standard regression metrics were employed. Each metric captures a different aspect of the prediction error
     \begin{itemize}
-        \item \textbf{Mean Absolute Error (MAE):}
-        Measures the average magnitude of the errors in a set of predictions, without considering their direction. It is the average over the test sample of the absolute differences between prediction and actual observation where all individual differences have equal weight
-        \item \textbf{Mean Squared Error (MSE):}
-        Measures the average of the squares of the errors. As it squares the errors before averaging, it penalizes larger errors more heavily than MAE.
-        \item \textbf{Root Mean Squared Error (RMSE):}
-        This is the square root of the MSE. It is one of the most commonly used metrics for regression tasks and is interpretable in the same units as the target variable (i.e., dollars in this context).
         \item \textbf{Coefficient of Determination (R² Score):}
         Represents the proportion of the variance in the dependent variable that is predictable from the independent variable(s). An R² score of 1 indicates that the model perfectly predicts the data, while a score of 0 indicates that the model performs no better than a simple mean-based baseline.
+
+        \begin{equation*}
+             R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}
+        \end{equation*}
+      
+        \item \textbf{Mean Absolute Error (MAE):}
+        Measures the average magnitude of the errors in a set of predictions, without considering their direction. It is the average over the test sample of the absolute differences between prediction and actual observation where all individual differences have equal weight.
+
+        \begin{equation*}
+            \text{MAE} = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|
+        \end{equation*}
+
+        \item \textbf{Mean Squared Error (MSE):}
+        Measures the average of the squares of the errors. As it squares the errors before averaging, it penalizes larger errors more heavily than MAE.
+
+        \begin{equation*}
+            \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+        \end{equation*}
+        
+        \item \textbf{Root Mean Squared Error (RMSE):}
+        This is the square root of the MSE. It is one of the most commonly used metrics for regression tasks and is interpretable in the same units as the target variable (i.e., dollars in this context).
+
+        \begin{equation*}
+            \text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
+        \end{equation*}
+
     \end{itemize}
 
 \subsubsection{Results and Comparative Analysis}
@@ -468,5 +489,7 @@ Building upon this work, we propose several promising directions for future rese
 \vspace{12pt}
 \bibliography{ref_all.bib}
 \bibliographystyle{IEEEtran}
+Article received on .....; accepted on ...... 
+*Corresponding author is Nguyen Viet Hung. 
 
 \end{document}
