@@ -229,30 +229,49 @@ to LSTM) but also provides a clear, intuitive representation of the balance betw
 \begin{table}[h!]
 \centering
 \caption{Mathematical Formulation of the Proposed L-GRU}
-\begin{tabular}{|l|l|}
-\hline
+\label{tab:equation}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}ll@{}} 
+\toprule
 \textbf{Gate Names} & \textbf{Formulas} \\
-\hline
-Relevance Gate ($r_t$) 
-& $ \sigma\!\left(\mathrm{LayerNorm}\left(W_{rh} h_{t-1} + W_{rx} x_t + W_{cr} \odot C_{t-1} + b_r\right)\right) $ \\
-
-Candidate State ($\tilde{C}_t$) 
-& $ \tanh\!\left(\mathrm{LayerNorm}\left(W_{Ch} (r_t \odot h_{t-1}) + W_{Cx} x_t + b_C\right)\right) $ \\
-
+\midrule
 Update Gate ($z_t$) 
-& $ \sigma\!\left(\mathrm{LayerNorm}\left(W_{zh} h_{t-1} + W_{zx} x_t + W_{cz} \odot C_{t-1} + b_z\right)\right) $ \\
+& $\begin{aligned}[t]
+    z_t = \sigma\Big(&\mathrm{LayerNorm}(W_{zh} h_{t-1} + W_{zx} x_t \\
+    & + W_{cz} \odot C_{t-1} + b_z)\Big)
+  \end{aligned}$ \\
+\addlinespace
 
-Cell State ($C_t$) 
-& $ z_t \odot C_{t-1} + (1 - z_t) \odot \tilde{C}_t $ \\
+Relevance Gate ($r_t$) 
+& $\begin{aligned}[t] % [t] aligns the formula to the top of the cell
+    r_t = \sigma\Big(&\mathrm{LayerNorm}(W_{rh} h_{t-1} + W_{rx} x_t \\
+    & + W_{cr} \odot C_{t-1} + b_r)\Big)
+  \end{aligned}$ \\
+\addlinespace % Adds a bit of vertical space
 
 Output Gate ($o_t$) 
-& $ \sigma\!\left(\mathrm{LayerNorm}\left(W_{oh} h_{t-1} + W_{ox} x_t + W_{co} \odot C_t + b_o\right)\right) $ \\
+& $\begin{aligned}[t]
+    o_t = \sigma\Big(&\mathrm{LayerNorm}(W_{oh} h_{t-1} + W_{ox} x_t \\
+    & + W_{co} \odot C_t + b_o)\Big)
+  \end{aligned}$ \\
+\addlinespace
+
+Candidate State ($\tilde{C}_t$) 
+& $\begin{aligned}[t]
+    \tilde{C}_t = \tanh\Big(&\mathrm{LayerNorm}(W_{Ch} (r_t \odot h_{t-1}) \\
+    & + W_{Cx} x_t + b_C)\Big)
+  \end{aligned}$ \\
+\addlinespace
+
+Cell State ($C_t$) 
+& $ C_t = z_t \odot C_{t-1} + (1 - z_t) \odot \tilde{C}_t $ \\
+\addlinespace
 
 Hidden State ($h_t$) 
-& $ o_t \odot \tanh(C_t) $ \\
-\hline
-\end{tabular}
-\label{tab:equation}
+& $ h_t = o_t \odot \tanh(C_t) $ \\
+\bottomrule
+\end{tabular}%
+}
 \end{table}
 
 
