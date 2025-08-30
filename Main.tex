@@ -234,25 +234,27 @@ to LSTM) but also provides a clear, intuitive representation of the balance betw
 \textbf{Gate Names} & \textbf{Formulas} \\
 \hline
 Relevance Gate ($r_t$) 
-& $ \sigma\big(W_r [h_{t-1}, x_t] + b_r\big) $ \\
+& $ \sigma\!\left(\mathrm{LayerNorm}\left(W_{rh} h_{t-1} + W_{rx} x_t + W_{cr} \odot C_{t-1} + b_r\right)\right) $ \\
 
 Candidate State ($\tilde{C}_t$) 
-& $ \tanh\big(W_c [r_t \odot h_{t-1}, x_t] + b_c\big) $ \\
+& $ \tanh\!\left(\mathrm{LayerNorm}\left(W_{Ch} (r_t \odot h_{t-1}) + W_{Cx} x_t + b_C\right)\right) $ \\
 
 Update Gate ($z_t$) 
-& $ \sigma\big(W_z [h_{t-1}, x_t] + b_z\big) $ \\
+& $ \sigma\!\left(\mathrm{LayerNorm}\left(W_{zh} h_{t-1} + W_{zx} x_t + W_{cz} \odot C_{t-1} + b_z\right)\right) $ \\
 
 Cell State ($C_t$) 
 & $ z_t \odot C_{t-1} + (1 - z_t) \odot \tilde{C}_t $ \\
 
 Output Gate ($o_t$) 
-& $ \sigma\big(W_o [h_{t-1}, x_t] + b_o\big) $ \\
+& $ \sigma\!\left(\mathrm{LayerNorm}\left(W_{oh} h_{t-1} + W_{ox} x_t + W_{co} \odot C_t + b_o\right)\right) $ \\
 
 Hidden State ($h_t$) 
 & $ o_t \odot \tanh(C_t) $ \\
 \hline
-\end{tabular}\label{tab: equation}
+\end{tabular}
+\label{tab:equation}
 \end{table}
+
 
 % \textbf{Relevance Gate}
 %   \begin{equation}
@@ -431,7 +433,7 @@ This subsection details the metrics used to evaluate the models' predictive accu
     
     The proposed L‑GRU model and three baseline models were trained and evaluated on the test set using the metrics defined above. The aggregated results are presented in Table \ref{tab:performance_comparison} and Figure \ref{fig:execution}.
 
-    \begin{table}[h!]
+    \begin{table*}[h!]
     \centering
     \caption{Performance Comparison of L-GRU and Baseline Models}
     \begin{tabular}{|l|l|l|l|l|}
@@ -445,7 +447,7 @@ This subsection details the metrics used to evaluate the models' predictive accu
     L-GRU       & 0.9688 & 6.28  & 71.48  & 8.45  \\ \hline
     \end{tabular}
     \label{tab:performance_comparison}
-    \end{table}
+    \end{table*}
 
     \begin{figure*}[h!]
         \centering
