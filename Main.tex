@@ -456,23 +456,27 @@ This subsection details the metrics used to evaluate the models' predictive accu
 
     \begin{table*}[h!]
     \centering
-    \caption{Performance Comparison of L-GRU and Baseline Models}
-    \begin{tabular}{|l|l|l|l|l|}
-    \hline
-    \textbf{Model} & \textbf{R\textsuperscript{2}} & \textbf{MAE} & \textbf{MSE} & \textbf{RMSE} \\ \hline
-    LSTM        & 0.9211 & 10.73 & 180.86 & 13.45 \\ \hline
-    GRU         & 0.9352 & 9.70  & 148.56 & 12.19 \\ \hline
-    Transformer & 0.9193 & 11.01 & 185.08 & 13.60 \\ \hline
-    CNN-LSTM & 0.9030 & 11.67 & 222.51 & 14.92 \\ \hline
-    LSTM-Transformer & 0.8962 & 12.23 & 238.10 & 15.43 \\ \hline
-    L-GRU       & 0.9688 & 6.28  & 71.48  & 8.45  \\ \hline
-    \end{tabular}
-    \label{tab:performance_comparison}
-    \end{table*}
+    \caption{Performance Comparison between L‑GRU and Hybrid/Baseline Models}
+    \label{tab:performance_comparison_full}
+    \resizebox{\textwidth}{!}{%
+    \begin{tabular}{@{}l|cccc|cccc|cccc@{}}
+    \toprule
+    \textbf{} & \multicolumn{4}{c|}{\textbf{Tesla (TSLA)}} & \multicolumn{4}{c|}{\textbf{S\&P 500}} & \multicolumn{4}{c}{\textbf{Bitcoin (BTC)}} \\
+    \cmidrule(l){2-5} \cmidrule(l){6-9} \cmidrule(l){10-13}
+    \textbf{Model} & \textbf{R²} & \textbf{MAE} & \textbf{MSE} & \textbf{RMSE} & \textbf{R²} & \textbf{MAE} & \textbf{MSE} & \textbf{RMSE} & \textbf{R²} & \textbf{MAE} & \textbf{MSE} & \textbf{RMSE} \\ \midrule
+    LSTM & 0.9211 & 10.73 & 180.86 & 13.45 & 0.8870 & 73.65 & 8798.83 & 93.80 & 0.9583 & 1108.07 & 2280215.50 & 1510.04 \\
+    GRU & 0.9352 & 9.70 & 148.56 & 12.19 & 0.9145 & 64.65 & 6656.98 & 81.59 & 0.9642 & 1066.57 & 1960167.50 & 1400.06 \\
+    Transformer & 0.9193 & 11.01 & 185.08 & 13.60 & 0.8897 & 72.77 & 8585.36 & 92.66 & 0.9632 & 1211.97 & 2012726.25 & 1418.71 \\
+    CNN-LSTM & 0.9030 & 11.67 & 222.51 & 14.92 & 0.8786 & 77.98 & 9452.82 & 97.23 & 0.9594 & 1121.89 & 2219390.25 & 1489.76 \\
+    LSTM-Transformer & 0.8962 & 12.23 & 238.10 & 15.43 & 0.8120 & 93.78 & 14633.35 & 120.97 & 0.9377 & 1478.84 & 3409516.75 & 1846.49 \\
+    \textbf{L-GRU} & \textbf{0.9686} & \textbf{6.33} & \textbf{72.06} & \textbf{8.49} & \textbf{0.9605} & \textbf{43.49} & \textbf{3070.91} & \textbf{55.42} & \textbf{0.9888} & \textbf{531.94} & \textbf{612323.50} & \textbf{782.51} \\ \bottomrule
+    \end{tabular}%
+    }
+\end{table*}
 
     \begin{figure*}[h!]
         \centering
-        \includegraphics[width=\textwidth]{Figure/Figure_1.png}
+        \includegraphics[width=\textwidth]{Figure/datasettonghop.png}
         \caption{Execution Results of the L‑GRU Model}
         \label{fig:execution}
     \end{figure*}
