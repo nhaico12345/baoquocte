@@ -178,10 +178,10 @@ The design of the L-GRU model is the outcome of a systematic research process, i
   In a standard LSTM, the candidate cell state \(\tilde{C}_t\)---representing potential new information---is generated directly from the previous hidden state \(h_{t-1}\) and the current input \(x_t\). However, \(h_{t-1}\) may contain recent past information that is no longer relevant to the current context, thereby introducing noise into the creation of new information.
 
   Inspired by the reset gate in GRU, we introduce a Relevance Gate \(r_t\). This gate acts as an intelligent filter, determining which portions of the past memory \(h_{t-1}\) are truly relevant and should be used for generating new information. By applying this filter \(r_t \odot h_{t-1}\), we ensure that the candidate cell state \(\tilde{C}_t\) is produced from selectively curated past information, making it more accurate and context-appropriate.Below is the complete formula finished at this step:
-    \begin{multline}
+    \begin{multline*}
   r_t = \sigma\!\big( W_r \left[\, h_{t-1},\; x_t \,\right] + b_r \big) \\&
   \tilde{C}_t = \tanh\!\big( W_c \left[\, r_t \odot h_{t-1},\; x_t \,\right] + b_c \big)
-   \end{multline}
+   \end{multline*}
    In a standard LSTM, two separate gates ($f_t$ and $i_t$) manage memory updates --- 
    one decides the proportion of old information to forget, and the other determines 
    the proportion of new information to add. Logically, these two actions are often 
@@ -193,10 +193,10 @@ The design of the L-GRU model is the outcome of a systematic research process, i
    previous cell state ($C_{t-1}$) to retain, while its complement, $(1 - z_t)$, 
    dictates the proportion of the candidate cell state ($\tilde{C}_t$) to incorporate. 
    The equations updated in this step are:
-\begin{multline}
+\begin{multline*}
     z_t = \sigma\left(W_z [h_{t-1}, x_t] + b_z\right) \\
     C_t = z_t \odot C_{t-1} + (1 - z_t) \odot \tilde{C}_t
-\end{multline}
+\end{multline*}
 
 
     
@@ -237,34 +237,34 @@ to LSTM) but also provides a clear, intuitive representation of the balance betw
 \midrule
 Update Gate ($z_t$) 
 & $\begin{aligned}[t]
-    z_t = \sigma\Big(&\mathrm{LayerNorm}(W_{zh} h_{t-1} + W_{zx} x_t \\
+    \sigma\Big(&\mathrm{LayerNorm}(W_{zh} h_{t-1} + W_{zx} x_t \\
     & + W_{cz} \odot C_{t-1} + b_z)\Big)
   \end{aligned}$ \\
 \addlinespace
 
 Relevance Gate ($r_t$) 
 & $\begin{aligned}[t] % [t] aligns the formula to the top of the cell
-    r_t = \sigma\Big(&\mathrm{LayerNorm}(W_{rh} h_{t-1} + W_{rx} x_t \\
+    \sigma\Big(&\mathrm{LayerNorm}(W_{rh} h_{t-1} + W_{rx} x_t \\
     & + W_{cr} \odot C_{t-1} + b_r)\Big)
   \end{aligned}$ \\
 \addlinespace % Adds a bit of vertical space
 
 Output Gate ($o_t$) 
 & $\begin{aligned}[t]
-    o_t = \sigma\Big(&\mathrm{LayerNorm}(W_{oh} h_{t-1} + W_{ox} x_t \\
+    \sigma\Big(&\mathrm{LayerNorm}(W_{oh} h_{t-1} + W_{ox} x_t \\
     & + W_{co} \odot C_t + b_o)\Big)
   \end{aligned}$ \\
 \addlinespace
 
 Candidate State ($\tilde{C}_t$) 
 & $\begin{aligned}[t]
-    \tilde{C}_t = \tanh\Big(&\mathrm{LayerNorm}(W_{Ch} (r_t \odot h_{t-1}) \\
+     \tanh\Big(&\mathrm{LayerNorm}(W_{Ch} (r_t \odot h_{t-1}) \\
     & + W_{Cx} x_t + b_C)\Big)
   \end{aligned}$ \\
 \addlinespace
 
 Cell State ($C_t$) 
-& $ C_t = z_t \odot C_{t-1} + (1 - z_t) \odot \tilde{C}_t $ \\
+& $ z_t \odot C_{t-1} + (1 - z_t) \odot \tilde{C}_t $ \\
 \addlinespace
 
 Hidden State ($h_t$) 
@@ -366,9 +366,11 @@ To ensure a fair and robust comparison, all experiments were conducted within a 
 \begin{enumerate}
 
 \subsubsection{Dataset Description}
-The empirical analysis is conducted on the historical stock price data of Tesla, Inc. (ticker: TSLA), a company renowned for its high volatility and significant market attention—making its stock a challenging and suitable case study for time‑series forecasting. The dataset, obtained from Yahoo Finance\footnote{https://www.kaggle.com/datasets/arashnic/time-series-forecasting-with-yahoo-stock-price}, spans the period from January 1, 2015, to January 16, 2024. This timeframe encompasses diverse market conditions, including periods of strong growth, downturns, and heightened volatility, thereby providing a solid testing ground for assessing the adaptability and generalization capabilities of the models.
+The empirical analysis is conducted on three distinct and challenging historical financial datasets to rigorously evaluate the model’s generalization capability. These datasets include the stock prices of Tesla, Inc. (ticker: TSLA), the S\&P 500 index (ticker: GSPC), and Bitcoin prices (ticker: BTC‑USD). The selection of these assets is intended to represent different classes with unique characteristics: a high‑volatility, high‑growth technology stock (TSLA), a broad market index reflecting the health of the U.S. economy (S\&P 500), and a highly speculative, extremely volatile cryptocurrency (Bitcoin).
 
-In this study, we focus on a univariate forecasting task, aiming to predict the future closing price based on its historical values. The 'Close' price is selected as the target variable. The raw time‑series data are preprocessed as follows: \\
+All data are sourced from Yahoo Finance\footnote{https://www.kaggle.com/datasets/arashnic/time-series-forecasting-with-yahoo-stock-price} over a consistent time frame spanning from early 2015 to early 2024. The diversity of asset types, combined with a time horizon encompassing varied market conditions—from strong growth and downturns to periods of heightened volatility—provides a robust testing environment for assessing the adaptability and generalization of the models.
+
+In this study, we focus on a univariate forecasting task, aiming to predict the future closing price (‘Close’) based solely on its historical values. The raw time‑series data are preprocessed as follows: \\
 \begin{itemize}
         \item \textbf{Normalization:}
         To stabilize the training process and ensure that the gradients remain within a manageable range, the entire 'Close' price series is scaled to the range [0, 1] using Min‑Max normalization. The scaler is fitted exclusively on the training data to prevent data leakage from the test set. An inverse transformation is applied to the model's predictions prior to evaluation in order to interpret the results on the original price scale.\\
